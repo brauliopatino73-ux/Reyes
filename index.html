@@ -1,0 +1,571 @@
+<!DOCTYPE html>
+<html lang="es" translate="no">
+<head>
+  <meta charset="UTF-8" />
+  <meta http-equiv="Content-Language" content="es">
+  <meta name="google" content="notranslate">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Carta de Reyes ✨</title>
+
+  <style>
+    :root{
+      --bg1:#0b1026;
+      --bg2:#121a3a;
+      --card:#ffffffd9;
+      --text:#121212;
+      --muted:#555;
+      --gold:#d6b35a;
+      --gold2:#f3d98c;
+      --shadow: 0 22px 80px rgba(0,0,0,.35);
+      --radius: 22px;
+    }
+
+    *{ box-sizing:border-box; }
+    body{
+      margin:0;
+      min-height:100vh;
+      font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","Segoe UI",Roboto,Arial,sans-serif;
+      color:var(--text);
+      overflow:hidden;
+      background:
+        radial-gradient(1200px 700px at 20% 10%, rgba(255,255,255,.06), transparent 55%),
+        radial-gradient(1000px 700px at 80% 30%, rgba(255,215,130,.10), transparent 50%),
+        linear-gradient(135deg, var(--bg1), var(--bg2));
+    }
+
+    /* estrellas */
+    .stars{ position:fixed; inset:0; z-index:0; pointer-events:none; }
+    .star{
+      position:absolute;
+      opacity:0;
+      animation: drift linear infinite;
+      filter: drop-shadow(0 6px 14px rgba(243,217,140,.18));
+      will-change: transform, opacity;
+    }
+    @keyframes drift{
+      0%{ transform: translateY(35vh) scale(.9); opacity:0; }
+      15%{ opacity:.55; }
+      55%{ opacity:.85; }
+      100%{ transform: translateY(-120vh) scale(1.15); opacity:0; }
+    }
+
+    /* capa de oscurecer + blur SOLO al inicio */
+    .dim{
+      position:fixed; inset:0;
+      background: rgba(0,0,0,.22);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      z-index:4;
+      opacity:1;
+      visibility:visible;
+      transition: opacity .28s ease, visibility .28s ease;
+    }
+    .dim.off{
+      opacity:0;
+      visibility:hidden;
+      backdrop-filter: none;
+      -webkit-backdrop-filter: none;
+    }
+
+    /* overlay inicio */
+    .overlay{
+      position:fixed; inset:0;
+      display:flex; align-items:center; justify-content:center;
+      z-index:6;
+      padding:22px;
+      transition:.28s ease;
+    }
+    .overlay.hidden{ opacity:0; visibility:hidden; pointer-events:none; }
+
+    .intro{
+      width:min(560px,96vw);
+      background: rgba(255,255,255,.92);
+      border-radius:28px;
+      box-shadow:0 26px 90px rgba(0,0,0,.40);
+      border:1px solid rgba(214,179,90,.25);
+      padding:26px 24px;
+      text-align:center;
+      position:relative;
+      overflow:hidden;
+    }
+    .intro::before{
+      content:"";
+      position:absolute; inset:-70px;
+      background:
+        radial-gradient(540px 260px at 30% 25%, rgba(214,179,90,.20), transparent 60%),
+        radial-gradient(540px 260px at 75% 55%, rgba(243,217,140,.20), transparent 60%);
+      transform: rotate(-10deg);
+      pointer-events:none;
+    }
+    .introInner{ position:relative; z-index:1; }
+
+    .crown{
+      font-size:46px;
+      animation:pulse 1.8s infinite;
+      margin:2px 0 6px;
+    }
+    @keyframes pulse{ 50%{ transform:scale(1.08); } }
+
+    .intro h2{
+      margin: 6px 0 10px;
+      font-size: 24px;
+      letter-spacing:.3px;
+    }
+    .intro p{
+      margin:0 0 14px;
+      color:var(--muted);
+      line-height:1.6;
+      font-size:15px;
+    }
+
+    .sealWrap{
+      display:flex; flex-direction:column; align-items:center; gap:10px;
+      margin-top: 6px;
+    }
+    .sealBtn{
+      width:108px; height:108px;
+      border-radius:50%;
+      border:none;
+      cursor:pointer;
+      background:
+        radial-gradient(circle at 30% 30%, #fff3cc, var(--gold2) 55%, var(--gold));
+      box-shadow:
+        0 18px 46px rgba(214,179,90,.35),
+        inset 0 6px 14px rgba(255,255,255,.70);
+      position:relative;
+      overflow:hidden;
+      animation:pulse 1.8s infinite;
+      display:flex; align-items:center; justify-content:center;
+    }
+    .sealBtn::after{
+      content:"";
+      position:absolute; inset:-45%;
+      background: radial-gradient(circle at 30% 30%, rgba(255,255,255,.85), transparent 45%);
+      transform: rotate(18deg);
+      opacity:.65;
+      transition: opacity .18s ease;
+      pointer-events:none;
+    }
+    .sealBtn:hover::after{ opacity:.95; }
+    .sealBtn:active{ transform: scale(.95); }
+
+    .sealIcon{
+      font-size:44px;
+      filter: drop-shadow(0 8px 14px rgba(0,0,0,.22));
+      position:relative; z-index:1;
+    }
+    .sealText{
+      font-size:13.7px;
+      color:rgba(18,18,18,.70);
+      letter-spacing:.3px;
+    }
+
+    /* contenido */
+    .wrap{
+      position:relative; z-index:1;
+      min-height:100vh;
+      display:flex; align-items:center; justify-content:center;
+      padding:20px;
+    }
+
+    .card{
+      width:min(920px,100%);
+      background:var(--card);
+      border-radius:var(--radius);
+      box-shadow:var(--shadow);
+      border:1px solid rgba(214,179,90,.18);
+      overflow:hidden;
+      transform: translateY(2px);
+      transition: transform .28s ease, box-shadow .28s ease;
+    }
+    body.opened .card{
+      transform: translateY(0);
+      box-shadow: 0 30px 100px rgba(0,0,0,.45);
+    }
+
+    .top{
+      padding:30px 24px 16px;
+      border-bottom:1px solid rgba(214,179,90,.18);
+      background:
+        radial-gradient(780px 220px at 15% 0%, rgba(214,179,90,.18), transparent 60%),
+        radial-gradient(780px 260px at 85% 0%, rgba(243,217,140,.18), transparent 60%);
+    }
+
+    .badge{
+      display:inline-block;
+      padding:10px 16px;
+      border-radius:999px;
+      background:rgba(214,179,90,.14);
+      color:#7a5a12;
+      font-weight:900;
+      letter-spacing:.25px;
+    }
+
+    h1{ margin:14px 0 6px; font-size:clamp(26px,4vw,38px); }
+    .subtitle{ color:var(--muted); font-size:14.5px; margin:0; line-height:1.5; }
+
+    .content{ padding:22px 24px 26px; }
+
+    .paper{
+      background:rgba(255,255,255,.90);
+      border:1px solid rgba(0,0,0,.06);
+      border-radius:18px;
+      padding:18px 18px 14px;
+      box-shadow: 0 10px 30px rgba(0,0,0,.05);
+      max-height:64vh;
+      overflow:auto;
+      -webkit-overflow-scrolling: touch;
+    }
+
+    .line{
+      white-space: pre-wrap;
+      opacity:0;
+      transform:translateY(10px);
+      transition: opacity .35s ease, transform .35s ease;
+      margin:0 0 14px 0;
+      line-height:1.9;
+      font-size:16.5px;
+    }
+    .line.show{ opacity:1; transform:none; }
+
+    .controls{ display:flex; gap:10px; flex-wrap:wrap; margin-top:12px; }
+
+    button.ui{
+      padding:12px 16px;
+      border-radius:14px;
+      border:none;
+      font-weight:900;
+      cursor:pointer;
+      letter-spacing:.2px;
+      transition: transform .12s ease, opacity .12s ease;
+    }
+    button.ui:active{ transform: translateY(1px) scale(.99); }
+
+    .primary{
+      background:linear-gradient(90deg,var(--gold),var(--gold2));
+      color:#3b2a05;
+      box-shadow: 0 14px 34px rgba(214,179,90,.25);
+    }
+    .ghost{
+      background:rgba(214,179,90,.14);
+      color:#6a4d0a;
+      border:1px solid rgba(214,179,90,.22);
+    }
+
+    .finalGlow{
+      display:none;
+      margin-top:10px;
+      padding:12px 14px;
+      border-radius:16px;
+      background:
+        radial-gradient(420px 160px at 20% 0%, rgba(214,179,90,.22), transparent 60%),
+        radial-gradient(420px 160px at 80% 20%, rgba(243,217,140,.22), transparent 60%),
+        rgba(255,255,255,.78);
+      border: 1px solid rgba(214,179,90,.18);
+      text-align:center;
+      font-weight:900;
+      color:#6a4d0a;
+      transform: scale(1);
+    }
+    .finalGlow.show{ display:block; }
+    .finalGlow.flash{
+      animation: glowFlash 1.1s ease-out;
+    }
+    @keyframes glowFlash{
+      0%{ transform: scale(0.98); box-shadow: 0 0 0 rgba(214,179,90,0); }
+      45%{ transform: scale(1.02); box-shadow: 0 18px 60px rgba(214,179,90,.32); }
+      100%{ transform: scale(1); box-shadow: 0 0 0 rgba(214,179,90,0); }
+    }
+
+    /* Firma en “sellos” */
+    .sealsRow{
+      display:none;
+      margin-top:10px;
+      gap:10px;
+      flex-wrap:wrap;
+      justify-content:center;
+    }
+    .sealsRow.show{ display:flex; }
+    .sealMini{
+      display:flex;
+      align-items:center;
+      gap:8px;
+      padding:10px 12px;
+      border-radius:999px;
+      background: rgba(214,179,90,.14);
+      border:1px solid rgba(214,179,90,.18);
+      color:#6a4d0a;
+      font-weight:900;
+      font-size:14px;
+    }
+
+    /* Botón “Pedir un deseo” */
+    .wishBox{
+      margin-top:10px;
+      padding:12px;
+      border-radius:16px;
+      background: rgba(255,255,255,.80);
+      border: 1px solid rgba(214,179,90,.18);
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:10px;
+      flex-wrap:wrap;
+    }
+    .wishMsg{
+      color: var(--muted);
+      font-size: 13.8px;
+      line-height: 1.4;
+    }
+
+    /* “Leer sin animación” (más claro) */
+    .smallNote{
+      font-size:12.8px;
+      color: rgba(18,18,18,.62);
+      margin-top: 8px;
+      text-align:center;
+    }
+
+    /* Estrellitas “pop” del deseo */
+    .wishSpark{
+      position:fixed;
+      z-index:7;
+      font-size:18px;
+      pointer-events:none;
+      opacity:0;
+      animation: spark 900ms ease-out forwards;
+      filter: drop-shadow(0 6px 14px rgba(243,217,140,.22));
+      will-change: transform, opacity;
+    }
+    @keyframes spark{
+      0%{ opacity:0; transform: translate(0,0) scale(.9); }
+      15%{ opacity:.95; }
+      100%{ opacity:0; transform: translate(var(--dx), var(--dy)) scale(1.35); }
+    }
+  </style>
+</head>
+
+<body class="lock">
+  <div class="stars" id="stars"></div>
+
+  <!-- capa blur (se apaga al abrir) -->
+  <div class="dim" id="dim"></div>
+
+  <!-- Sonido de campanita (OPCIONAL)
+       1) Coloca un archivo llamado campana.mp3 en la misma carpeta
+       2) Si no lo pones, no pasa nada (no truena). -->
+  <audio id="chime" preload="auto">
+    <source src="campana.mp3" type="audio/mpeg">
+  </audio>
+
+  <div class="overlay" id="overlay">
+    <div class="intro">
+      <div class="introInner">
+        <div class="crown">👑</div>
+        <h2>Mensaje de los Reyes Magos</h2>
+        <p>Hemos viajado muy lejos para dejarte una carta…<br>Ábrela cuando estés lista ✨</p>
+
+        <div class="sealWrap">
+          <button class="sealBtn" id="openBtn" aria-label="Abrir carta">
+            <span class="sealIcon">✨</span>
+          </button>
+          <div class="sealText">Toca el sello para abrir</div>
+        </div>
+
+        <div class="hint">Tip: hoy la magia también se escribe ✨</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="wrap">
+    <section class="card">
+      <div class="top">
+        <div class="badge">✨ Carta de Reyes Magos ✨</div>
+        <h1>Para Jatsumi</h1>
+        <p class="subtitle">Un mensaje con cuidado, magia y esperanza</p>
+      </div>
+
+      <div class="content">
+        <div class="paper" id="paper">
+
+          <p class="line">Querida Jatsumi ✨</p>
+
+          <p class="line">
+            Desde muy lejos hemos observado tu camino y queremos que sepas algo importante: no todo lo que ocurre a tu alrededor define quién eres. A veces la vida pone pruebas difíciles, especialmente en los lugares donde más se espera comprensión, pero eso no significa que estés haciendo algo mal.
+          </p>
+
+          <p class="line">
+            Eres una persona con un corazón grande, sensible y lleno de luz. Incluso en los momentos complicados, sigues teniendo la capacidad de sentir, cuidar y querer, y eso es algo muy valioso.
+          </p>
+
+          <p class="line">
+            Nuestro deseo para este nuevo año es que encuentres calma, que poco a poco te rodees de personas que te hagan sentir segura, escuchada y acompañada. Nadie debería caminar sola, y siempre habrá manos dispuestas a sostenerte cuando lo necesites.
+          </p>
+
+          <p class="line">
+            Recuerda que no tienes que cargar con problemas que no te corresponden. Priorizar tu bienestar también es un acto de valentía, y mereces paz.
+          </p>
+
+          <p class="line">
+            La magia no siempre llega envuelta, a veces aparece en forma de apoyo, comprensión y pequeños momentos de tranquilidad. Confía en que este año traerá caminos más amables para ti.
+          </p>
+
+          <p class="line">Con cariño,</p>
+
+          <!-- Firma estilo “sellos” (se muestra al final) -->
+          <div class="sealsRow" id="sealsRow">
+            <div class="sealMini">👑 Melchor</div>
+            <div class="sealMini">👑 Gaspar</div>
+            <div class="sealMini">👑 Baltasar</div>
+          </div>
+
+          <div class="finalGlow" id="finalGlow">Nunca dejes de brillar✨</div>
+
+          <!-- Deseo interactivo (sin presión) -->
+          <div class="wishBox" id="wishBox" style="display:none;">
+            <div class="wishMsg" id="wishMsg">Si quieres, puedes pedir un deseo…</div>
+            <button class="ui primary" id="wishBtn">Pedir un deseo ✨</button>
+          </div>
+
+          <div class="controls">
+            <button class="ui primary" id="nextBtn">Siguiente 📜</button>
+            <button class="ui ghost" id="allBtn">Ver toda ✨</button>
+          </div>
+
+          <div class="smallNote">💡 Si prefieres leer de una vez: “Ver toda ✨”</div>
+
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <script>
+    // Estrellitas del fondo
+    const stars = document.getElementById("stars");
+    const icons = ["✨","⭐","🌟"];
+    const STAR_COUNT = 26;
+
+    function spawnStar(){
+      const s = document.createElement("div");
+      s.className = "star";
+      s.textContent = icons[Math.floor(Math.random()*icons.length)];
+      s.style.left = (Math.random()*100) + "vw";
+      s.style.top  = (60 + Math.random()*60) + "vh";
+      s.style.fontSize = (14 + Math.random()*18) + "px";
+      s.style.animationDuration = (7 + Math.random()*10) + "s";
+      s.style.animationDelay = (Math.random()*3) + "s";
+      return s;
+    }
+    for(let i=0;i<STAR_COUNT;i++) stars.appendChild(spawnStar());
+
+    // Abrir carta (quita blur + campanita)
+    const overlay = document.getElementById("overlay");
+    const dim = document.getElementById("dim");
+    const chime = document.getElementById("chime");
+
+    document.getElementById("openBtn").addEventListener("click", () => {
+      overlay.classList.add("hidden");
+      dim.classList.add("off");             // apaga blur
+      document.body.classList.add("opened");
+
+      // Campanita (si existe el archivo, sonará; si no, no pasa nada)
+      chime.volume = 0.55;
+      chime.play().catch(()=>{});
+
+      revealNext();
+    });
+
+    // Revelado por pasos
+    const lines = [...document.querySelectorAll(".line")];
+    let idx = -1;
+
+    const nextBtn = document.getElementById("nextBtn");
+    const allBtn  = document.getElementById("allBtn");
+    const finalGlow = document.getElementById("finalGlow");
+    const paper = document.getElementById("paper");
+    const sealsRow = document.getElementById("sealsRow");
+    const wishBox = document.getElementById("wishBox");
+    const wishBtn = document.getElementById("wishBtn");
+    const wishMsg = document.getElementById("wishMsg");
+
+    function finish(){
+      nextBtn.textContent = "Listo ✨";
+      nextBtn.disabled = true;
+      nextBtn.style.opacity = ".75";
+
+      // muestra firma y cierre
+      sealsRow.classList.add("show");
+      finalGlow.classList.add("show");
+      finalGlow.classList.remove("flash");
+      void finalGlow.offsetWidth; // reinicia animación
+      finalGlow.classList.add("flash");
+
+      // muestra deseo interactivo
+      wishBox.style.display = "flex";
+
+      paper.scrollTo({ top: paper.scrollHeight, behavior: "smooth" });
+    }
+
+    function revealNext(){
+      idx++;
+      if(idx < lines.length){
+        lines[idx].classList.add("show");
+        lines[idx].scrollIntoView({ behavior: "smooth", block: "nearest" });
+      }
+      if(idx >= lines.length - 1) finish();
+    }
+
+    nextBtn.addEventListener("click", revealNext);
+
+    allBtn.addEventListener("click", () => {
+      lines.forEach(l => l.classList.add("show"));
+      idx = lines.length - 1;
+      finish();
+    });
+
+    // Pedir un deseo (estrellitas + mensaje bonito)
+    function popWishes(x, y){
+      const popIcons = ["✨","⭐","🌟","💫"];
+      for(let i=0;i<14;i++){
+        const p = document.createElement("div");
+        p.className = "wishSpark";
+        p.textContent = popIcons[Math.floor(Math.random()*popIcons.length)];
+        p.style.left = x + "px";
+        p.style.top  = y + "px";
+        const dx = (Math.random()*240 - 120) + "px";
+        const dy = (Math.random()*220 - 140) + "px";
+        p.style.setProperty("--dx", dx);
+        p.style.setProperty("--dy", dy);
+        p.style.fontSize = (16 + Math.random()*14) + "px";
+        document.body.appendChild(p);
+        setTimeout(() => p.remove(), 950);
+      }
+    }
+
+    const wishMessages = [
+      "✨ Deseo: que este año sea más amable contigo.",
+      "⭐ Deseo: que te rodees de paz y de gente bonita.",
+      "🌟 Deseo: que encuentres calma, poquito a poquito.",
+      "💫 Deseo: que te sientas cuidada y acompañada."
+    ];
+    let wished = false;
+
+    wishBtn.addEventListener("click", (e) => {
+      const rect = wishBtn.getBoundingClientRect();
+      const x = rect.left + rect.width/2;
+      const y = rect.top + rect.height/2;
+
+      popWishes(x, y);
+
+      if(!wished){
+        wishMsg.textContent = wishMessages[Math.floor(Math.random()*wishMessages.length)];
+        wishBtn.textContent = "Otro deseo ✨";
+        wished = true;
+      }else{
+        // cambia mensaje sin presionar mucho
+        wishMsg.textContent = wishMessages[Math.floor(Math.random()*wishMessages.length)];
+      }
+    });
+  </script>
+</body>
+</html>
